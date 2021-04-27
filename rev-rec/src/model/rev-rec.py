@@ -1,5 +1,4 @@
 import json
-import numpy as np
 from multiprocessing import Pool    
 
 def read_raw_json( f_name : str ) -> dict :
@@ -134,7 +133,13 @@ def model( data_path : str ):
     with Pool( 8 ) as p:
         candidates = p.starmap( compute_candidates_scores, params )
         print('finish compute candidate')
-        candidates = p.starmap( rank_candidate, candidates )
+
+        with open('candidates.json','w') as f:
+            json.dump( candidates, f )
+
+        candidates = p.map( rank_candidate, candidates )
+        with open('rank_candidate.json','w') as f:
+            json.dump( candidates, f )
         print('finish ranking candidate')
 
     print( 'top_k_accuracy' )
