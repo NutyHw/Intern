@@ -132,7 +132,9 @@ def model( data_path : str ):
 
     with Pool( 8 ) as p:
         candidates = p.starmap( compute_candidates_scores, params )
+        print('finish compute candidate')
         candidates = p.starmap( rank_candidate, candidates )
+        print('finish ranking candidate')
 
     print( 'top_k_accuracy' )
     print(f'k = 1 : { top_k_accuracy( 1, candidates, sorted_reviews ) }')
