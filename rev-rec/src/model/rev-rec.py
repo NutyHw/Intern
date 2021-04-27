@@ -1,4 +1,6 @@
 import json
+import numpy as np
+from multiprocessing import Pool    
 
 def read_raw_json( f_name : str ) -> dict :
     with open( f_name ) as f:
@@ -113,18 +115,24 @@ def top_k_accuracy( k : int, candidates : list, reviews : list ):
         for reviewer in review['reviewers']:
             if reviewer['accountId'] in candidates[idx][:k]:
                 score += 1
+                break
     return score / len(reviews)
+
+def create_params( sorted_reviews : list ):
+    params = list()
+    for idx, review in enumerate(sorted_reviews[1:], start=1):
+        params.append( ( sorted_reviews[:idx], review ) )
+    return params
 
 def model( data_path : str ):
     data = read_raw_json( data_path )
     sorted_reviews = sorted( data, key=lambda item : item['timestamp'] )
 
-    candidates = list()
-    for idx, review in enumerate(sorted_reviews[1:], start=1):
-        candidates_score = compute_candidates_scores( sorted_reviews[:idx], review )
-        candidate = rank_candidate(candidates_score)
+    params = create_params( sorted_reviews )
 
-        candidates.append( candidate )
+    with Pool( 8 ) as p:
+        candidates = p.starmap( compute_candidates_scores, params )
+        candidates = p.starmap( rank_candidate, candidates )
 
     print( 'top_k_accuracy' )
     print(f'k = 1 : { top_k_accuracy( 1, candidates, sorted_reviews ) }')
