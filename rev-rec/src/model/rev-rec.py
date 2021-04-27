@@ -91,10 +91,10 @@ def compute_candidates_scores( past_reviews : list, cur_review : dict ):
     return candidates
 
 def rank_candidate( candidates_score : dict ):
-    lcp_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCP'], reverse=True ) if item[1]['LCP'] != 0 ]
-    lcs_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCS'], reverse= True ) if item[1]['LCS'] != 0 ]
-    lcsubstr_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCSubstr'], reverse= True ) if item[1]['LCSubstr'] != 0 ]
-    lcsubseq_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCSubseq'], reverse= True ) if item[1]['LCSubseq'] != 0 ]
+    lcp_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCP'], reverse=True ) if item[1] != 0 ]
+    lcs_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCS'], reverse= True ) if item[1] != 0 ]
+    lcsubstr_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCSubstr'], reverse= True ) if item[1] != 0 ]
+    lcsubseq_ranks = [ item[0] for item in sorted( candidates_score.items(), key=lambda item : item[1]['LCSubseq'], reverse= True ) if item[1] != 0 ]
 
     comb_scores = dict()
     for idx, candidate in enumerate(lcp_ranks):
@@ -116,6 +116,7 @@ def top_k_accuracy( k : int, candidates : list, reviews : list ):
             if reviewer['accountId'] in candidates[idx][:k]:
                 score += 1
                 break
+
     return score / len(reviews)
 
 def create_params( sorted_reviews : list ):
