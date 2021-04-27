@@ -112,7 +112,8 @@ def top_k_accuracy( k : int, candidates : list, reviews : list ):
     score = 0
     for idx, review in enumerate(reviews):
         for reviewer in review['reviewers']:
-            if reviewer['accountId'] in candidates[idx][:k]:
+            top_k_candidates = candidates[idx][:k] if k < len(candidates[idx]) else candidates[idx]
+            if reviewer in top_k_candidates:
                 score += 1
                 break
 
@@ -130,17 +131,21 @@ def model( data_path : str ):
 
     params = create_params( sorted_reviews )
 
-    with Pool( 8 ) as p:
-        candidates = p.starmap( compute_candidates_scores, params )
-        print('finish compute candidate')
+    # with Pool( 8 ) as p:
+        # candidates = p.starmap( compute_candidates_scores, params )
+        # print('finish compute candidate')
 
-        with open('candidates.json','w') as f:
-            json.dump( candidates, f )
+        # with open('candidates.json','w') as f:
+            # json.dump( candidates, f )
 
-        candidates = p.map( rank_candidate, candidates )
-        with open('rank_candidate.json','w') as f:
-            json.dump( candidates, f )
-        print('finish ranking candidate')
+        # candidates = p.map( rank_candidate, candidates )
+        # with open('rank_candidate.json','w') as f:
+            # json.dump( candidates, f )
+        # print('finish ranking candidate')
+
+    candidates = list()
+    with open('rank_candidate.json') as f:
+        candidates = json.load(f)
 
     print( 'top_k_accuracy' )
     print(f'k = 1 : { top_k_accuracy( 1, candidates, sorted_reviews ) }')
